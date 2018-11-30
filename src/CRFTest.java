@@ -9,8 +9,44 @@ import java.util.Scanner;
 public class CRFTest {
     public static void main(String[] args) throws FileNotFoundException {
         ArrayList<String>[] dataSet = readData("data/train.utf8");
-        CRF crf = new CRF("data/template.utf8");
+        CRF crf = new CRF("data/testTemplate.utf8");
 
+        ArrayList<String> sentences = dataSet[0];
+        ArrayList<String> results = dataSet[1];
+
+        //train
+        for (int iter = 1; iter <= 30; iter++) {
+            for (int i = 0; i < 18755; i++) {
+                String sentence = sentences.get(i);
+                String result = results.get(i);
+                crf.train(sentence, result);
+            }
+            System.out.println("iter " + iter + " ok!");
+        }
+
+        //test
+        int total = 0;
+        float correct = 0;
+        for (int i = 18755; i < 23444; i++) {
+            String sentence = sentences.get(i);
+            String result = results.get(i);
+            total += sentence.length();
+            String myRes = crf.segment(sentence);
+            correct += getSameNum(result, myRes);
+        }
+        float accuracy = correct / total;
+        System.out.println("accuracy in test set is: " + accuracy);
+    }
+
+    private static int getSameNum(String s1, String s2) {
+        int count = 0;
+        int num = s1.length();
+        for (int i = 0; i < num; i++) {
+            if (s1.substring(i, i + 1).equals(s2.substring(i, i + 1))) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private static ArrayList<String>[] readData(String fileName) throws FileNotFoundException {

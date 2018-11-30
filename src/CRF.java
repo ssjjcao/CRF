@@ -131,7 +131,7 @@ public class CRF {
         StringBuilder stringBuilder = new StringBuilder();
         for (int offset : template) {
             int index = pos + offset;
-            if (index < 0) {
+            if (index < 0 || index >= sentence.length()) {
                 stringBuilder.append(" ");
             } else {
                 String thisCharacter = sentence.substring(index, index + 1);
@@ -149,6 +149,7 @@ public class CRF {
             String myResI = myRes.substring(i, i + 1);
             String theoryResI = theoryRes.substring(i, i + 1);
             if (!myResI.equals(theoryResI)) {
+                //update Unigram template
                 for (int[] uniTem : getUniTemplate()) {
                     String uniMyKey = makeKey(uniTem, sentence, i, myResI);
                     if (scoreMap.get(uniMyKey) == null) {
@@ -167,6 +168,7 @@ public class CRF {
                     }
                 }
 
+                //update Bigram template
                 for (int[] biTem : getBiTemplate()) {
                     String biMyKey;
                     if (i >= 1) {
