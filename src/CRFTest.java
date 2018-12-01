@@ -15,22 +15,26 @@ public class CRFTest {
         ArrayList<String> results = dataSet[1];
 
         //train
-        for (int iter = 1; iter <= 10; iter++) {
-            for (int i = 0; i < 19000; i++) {
+        for (int iter = 1; iter <= 20; iter++) {
+            int wrongNum = 0;
+            int totalTest = 0;
+            for (int i = 0; i < 18900; i++) {
                 String sentence = sentences.get(i);
+                totalTest += sentence.length();
                 String result = results.get(i);
-                crf.train(sentence, result);
+                wrongNum += crf.train(sentence, result);
             }
-            System.out.println("iter " + iter + " ok");
+            float corrNum = totalTest - wrongNum;
+            System.out.println("iter " + iter + " accuracy is :" + (corrNum / totalTest));
         }
 
         //test
         int total = 0;
         float correct = 0;
-        for (int i = 19000; i < 23444; i++) {
+        for (int i = 18900; i < 23444; i++) {
             String sentence = sentences.get(i);
-            String result = results.get(i);
             total += sentence.length();
+            String result = results.get(i);
             String myRes = crf.segment(sentence);
             correct += getSameNum(result, myRes);
         }

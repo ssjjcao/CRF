@@ -145,13 +145,15 @@ public class CRF {
         return stringBuilder.toString();
     }
 
-    public void train(String sentence, String theoryRes) {
+    public int train(String sentence, String theoryRes) {
         String myRes = segment(sentence);
         int len = sentence.length();
+        int wrongNum = 0;
         for (int i = 0; i < len; i++) {
             String myResI = myRes.substring(i, i + 1);
             String theoryResI = theoryRes.substring(i, i + 1);
             if (!myResI.equals(theoryResI)) {
+                wrongNum++;
                 //update Unigram template
                 ArrayList<int[]> uniTem = getUniTemplate();
                 int uniNum = uniTem.size();
@@ -203,6 +205,7 @@ public class CRF {
                 }
             }
         }
+        return wrongNum;
     }
 
     private String getStatus(int row) {
