@@ -9,25 +9,25 @@ import java.util.Scanner;
 public class CRFTest {
     public static void main(String[] args) throws FileNotFoundException {
         ArrayList<String>[] dataSet = readData("data/train.utf8");
-        CRF crf = new CRF("data/testTemplate.utf8");
+        CRF crf = new CRF("data/template.utf8");
 
         ArrayList<String> sentences = dataSet[0];
         ArrayList<String> results = dataSet[1];
 
         //train
-        for (int iter = 1; iter <= 30; iter++) {
-            for (int i = 0; i < 18755; i++) {
+        for (int iter = 1; iter <= 10; iter++) {
+            for (int i = 0; i < 19000; i++) {
                 String sentence = sentences.get(i);
                 String result = results.get(i);
                 crf.train(sentence, result);
             }
-            System.out.println("iter " + iter + " ok!");
+            System.out.println("iter " + iter + " ok");
         }
 
         //test
         int total = 0;
         float correct = 0;
-        for (int i = 18755; i < 23444; i++) {
+        for (int i = 19000; i < 23444; i++) {
             String sentence = sentences.get(i);
             String result = results.get(i);
             total += sentence.length();

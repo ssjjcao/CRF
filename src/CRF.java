@@ -106,8 +106,9 @@ public class CRF {
     private int getUniScore(String sentence, int thisPos, String thisStatus) {
         int uniScore = 0;
         ArrayList<int[]> uniTemplate = getUniTemplate();
-        for (int[] template : uniTemplate) {
-            String key = makeKey(template, sentence, thisPos, thisStatus);
+        int num = uniTemplate.size();
+        for (int i = 0; i < num; i++) {
+            String key = makeKey(uniTemplate.get(i), "" + i, sentence, thisPos, thisStatus);
             if (scoreMap.get(key) != null) {
                 uniScore += scoreMap.get(key);
             }
@@ -118,8 +119,9 @@ public class CRF {
     private int getBiScore(String sentence, int thisPos, String preStatus, String thisStatus) {
         int biScore = 0;
         ArrayList<int[]> biTemplate = getBiTemplate();
-        for (int[] template : biTemplate) {
-            String key = makeKey(template, sentence, thisPos, preStatus + thisStatus);
+        int num = biTemplate.size();
+        for (int i = 0; i < num; i++) {
+            String key = makeKey(biTemplate.get(i), "" + i, sentence, thisPos, preStatus + thisStatus);
             if (scoreMap.get(key) != null) {
                 biScore += scoreMap.get(key);
             }
@@ -127,8 +129,9 @@ public class CRF {
         return biScore;
     }
 
-    private String makeKey(int[] template, String sentence, int pos, String statusCovered) {
+    private String makeKey(int[] template, String identity, String sentence, int pos, String statusCovered) {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(identity);
         for (int offset : template) {
             int index = pos + offset;
             if (index < 0 || index >= sentence.length()) {
@@ -150,8 +153,10 @@ public class CRF {
             String theoryResI = theoryRes.substring(i, i + 1);
             if (!myResI.equals(theoryResI)) {
                 //update Unigram template
-                for (int[] uniTem : getUniTemplate()) {
-                    String uniMyKey = makeKey(uniTem, sentence, i, myResI);
+                ArrayList<int[]> uniTem = getUniTemplate();
+                int uniNum = uniTem.size();
+                for (int uniIndex = 0; uniIndex < uniNum; uniIndex++) {
+                    String uniMyKey = makeKey(uniTem.get(uniIndex), "" + uniIndex, sentence, i, myResI);
                     if (scoreMap.get(uniMyKey) == null) {
                         scoreMap.put(uniMyKey, -1);
                     } else {
@@ -159,7 +164,7 @@ public class CRF {
                         scoreMap.put(uniMyKey, myRawVal - 1);
                     }
 
-                    String uniTheoryKey = makeKey(uniTem, sentence, i, theoryResI);
+                    String uniTheoryKey = makeKey(uniTem.get(uniIndex), "" + uniIndex, sentence, i, theoryResI);
                     if (scoreMap.get(uniTheoryKey) == null) {
                         scoreMap.put(uniTheoryKey, 1);
                     } else {
@@ -169,13 +174,19 @@ public class CRF {
                 }
 
                 //update Bigram template
-                for (int[] biTem : getBiTemplate()) {
+                ArrayList<int[]> biTem = getBiTemplate();
+                int biNum = biTem.size();
+                for (int biIndex = 0; biIndex < biNum; biIndex++) {
                     String biMyKey;
+                    String biTheoryKey;
                     if (i >= 1) {
-                        biMyKey = makeKey(biTem, sentence, i, myRes.substring(i - 1, i + 1));
+                        biMyKey = makeKey(biTem.get(biIndex), "" + biIndex, sentence, i, myRes.substring(i - 1, i + 1));
+                        biTheoryKey = makeKey(biTem.get(biIndex), "" + biIndex, sentence, i, theoryRes.substring(i - 1, i + 1));
                     } else {
-                        biMyKey = makeKey(biTem, sentence, i, " " + myResI);
+                        biMyKey = makeKey(biTem.get(biIndex), "" + biIndex, sentence, i, " " + myResI);
+                        biTheoryKey = makeKey(biTem.get(biIndex), "" + biIndex, sentence, i, " " + theoryResI);
                     }
+
                     if (scoreMap.get(biMyKey) == null) {
                         scoreMap.put(biMyKey, -1);
                     } else {
@@ -183,12 +194,6 @@ public class CRF {
                         scoreMap.put(biMyKey, myRawVal - 1);
                     }
 
-                    String biTheoryKey;
-                    if (i >= 1) {
-                        biTheoryKey = makeKey(biTem, sentence, i, theoryRes.substring(i - 1, i + 1));
-                    } else {
-                        biTheoryKey = makeKey(biTem, sentence, i, " " + theoryResI);
-                    }
                     if (scoreMap.get(biTheoryKey) == null) {
                         scoreMap.put(biTheoryKey, 1);
                     } else {
