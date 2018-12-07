@@ -1,2 +1,2 @@
-# Conditional Random Field
-Chinese Word Segmentation using CRF
+# Chinese Word Segmentation
+naive Chinese Word Segmentation using Liner-Chain CRF
